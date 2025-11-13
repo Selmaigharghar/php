@@ -1,0 +1,13 @@
+body {
+  background-color: #e3ecf8f8;
+  height: 100%;
+  margin: 0; /* deze heeft ervoor gezorgd dat er geen stuk meer zit tussen het einde van het scherm en de zijbalk*/
+}
+
+header {
+    background-color: rgb(34, 34, 168);
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    margin-top: 0%;
+}
