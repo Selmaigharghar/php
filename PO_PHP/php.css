@@ -37,3 +37,7 @@ input[type=text]{
     margin-right: 16px;
     font-size: 17px;
 }
+
+button {
+    background-color: rgb(233, 87, 213);
+}
