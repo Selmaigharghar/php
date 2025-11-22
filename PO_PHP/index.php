@@ -28,8 +28,18 @@ function vraagNiveau() {
 }
 </script>
 
-        </header>
+</header>
+        
 <?php
+$con = mysqli_connect("localhost","root","","po_webapp");
+
+// Check connection
+if (mysqli_connect_errno()) {
+  echo "Failed to connect to MySQL: " . mysqli_connect_error();
+  exit();
+}
+echo "verbinding is gelukt!";
+
 session_start();
 
 if (isset($_GET['niveau'])) {
