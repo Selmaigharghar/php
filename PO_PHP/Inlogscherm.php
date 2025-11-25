@@ -52,27 +52,6 @@
     </style>
 </head>
 <body>
-<?php
-session_start();
-
-$correct_user = "emma01";
-$correct_pass = "wachtwoord123";
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['uname'] ?? '';
-    $password = $_POST['psw'] ?? '';
-
-    if ($username === $correct_user && $password === $correct_pass) {
-        $_SESSION['logged_in'] = true;
-        $_SESSION['username'] = $username;
-        header("Location: index.php");
-        exit();
-    } else {
-        echo "<p style='color:red;'>Gebruikersnaam of wachtwoord onjuist!</p>";
-    }
-}
-?>
-
 <form action="" method="post">
     <div class="container">
         <label for="uname"><b>Inloggen</b></label>
@@ -85,5 +64,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </label>
     </div>
 </form>
+
+<?php
+session_start(); // Start de sessie
+
+// Verbinding maken met database
+$con = mysqli_connect("localhost", "root", "", "po_webapp");
+if (!$con) {
+    die("Databasefout: " . mysqli_connect_error());
+}
+
+// Als het formulier is verzonden
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $username = $_POST["uname"] ?? "";
+    $password = $_POST["psw"] ?? "";
+
+    // Bereid SQL query voor
+    $sql = "SELECT id, gebruikersnaam, wachtwoord, niveau, leerjaar, school 
+            FROM gebruiker 
+            WHERE gebruikersnaam = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_store_result($stmt);
+
+    // Check of gebruiker bestaat
+    if (mysqli_stmt_num_rows($stmt) === 1) {
+
+        mysqli_stmt_bind_result($stmt, $id, $db_user, $db_pass, $niveau, $leerjaar, $school);
+        mysqli_stmt_fetch($stmt);
+
+        // Controle wachtwoord (nu plain-text)
+        if ($password === $db_pass) {
+            // Vul sessievariabelen
+            $_SESSION["logged_in"] = true;
+            $_SESSION["user_id"] = $id;
+            $_SESSION["username"] = $db_user;
+            $_SESSION["niveau"] = $niveau;
+            $_SESSION["leerjaar"] = $leerjaar;
+            $_SESSION["school"] = $school;
+
+            // Redirect naar index
+            header("Location: index.php");
+            exit();
+        } else {
+            $error = "Wachtwoord onjuist!";
+        }
+    } else {
+        $error = "Gebruiker bestaat niet!";
+    }
+
+    mysqli_stmt_close($stmt);
+}
+
+mysqli_close($con);
+?>
 </body>
 </html>
