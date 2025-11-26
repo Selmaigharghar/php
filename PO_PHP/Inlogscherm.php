@@ -62,6 +62,45 @@
         <label>
             <input type="checkbox" checked="checked" name="remember"> Onthoud mij
         </label>
+        <div class="bottom-container">
+  <div class="row">
+    <div class="col">
+	<button onclick="document.getElementById('id01').style.display='block'" style="width:auto">Aanmelden</button>
+<!--De <button>-tag definieert een klikbare knop.-->
+<!--Het onclick-attribuut wordt geactiveerd door een muisklik op het element.-->
+    </div>
+  </div>
+</div>
+<div id="id01" class="modal">
+<!--Het ID-attribuut: wordt gebruikt om de koppeling met een ID te realiseren.-->
+  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+ <!--Het title-element specificeert extra informatie over een element.-->
+   <form class="modal-content" action="register.php" method="POST">
+  <div class="container">
+    <h1>Aanmelden</h1>
+    <p>Vul uw gegevens in om een account aan te maken.</p>
+    <hr>
+
+    <label for="email"><b>Email</b></label>
+    <input type="text" placeholder="Uw e-mailadres" name="email" required>
+
+    <label for="psw"><b>Wachtwoord</b></label>
+    <input type="password" placeholder="Uw wachtwoord" name="psw" required>
+
+    <label for="psw-repeat"><b>Herhaal wachtwoord</b></label>
+    <input type="password" placeholder="Herhaal uw wachtwoord" name="psw_repeat" required>
+
+    <label>
+      <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Onthouden
+    </label>
+
+    <p>Door dit account aan te maken gaat u akkoord met onze <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>
+
+    <div class="clearfix">
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+      <button type="submit" class="signupbtn">Aanmelden</button>
+    </div>
+  </div>
     </div>
 </form>
 
