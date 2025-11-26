@@ -71,6 +71,7 @@
     </div>
   </div>
 </div>
+    </form>
 <div id="id01" class="modal">
 <!--Het ID-attribuut: wordt gebruikt om de koppeling met een ID te realiseren.-->
   <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
