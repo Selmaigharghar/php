@@ -1,8 +1,76 @@
+<?php
+session_start(); // Dit start de PHP-sessie
+
+// CONTROLE: Controleert of de gebruiker al is ingelogd.
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    header("Location: index.php"); // Stuurt je wanneer je bent ingelogd direct door naar de hoofdpagina
+    exit(); // Stopt de verdere verwerking van dit script
+}
+
+// Zorgt voor een verbinding met de database
+$con = mysqli_connect("localhost", "root", "", "po_webapp");
+if (!$con) {
+     die("Databasefout: " . mysqli_connect_error()); // Als de verbinding mislukt, stopt de code en zie je een foutmelding
+}
+
+$error = ""; // Initialiseert een lege variabele om eventuele inlgfouten in op te slaan
+
+// Controleert of het de inlogformuliergegevens zijn verzonden via de POST-methode
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+     $username_or_email = $_POST["uname"] ?? ""; // leest de ingevulde gebruikersnaam of e-mail uit het formulier
+     $password = $_POST["psw"] ?? ""; // Leest het ingevulde wachtwoord uit het formulier
+
+    // VEILIGE QUERY: Selecteert alle benodigde kolommen om in te loggen en de sessie te vullen.
+     $sql = "SELECT id, gebruikersnaam, wachtwoord, niveau, leerjaar, school, vak_id
+     FROM gebruiker 
+     WHERE gebruikersnaam = ? OR email = ?"; // Zoekt de gebruiker op basis van ofwel de gebruikersnaam of het e-mailadres
+     $stmt = mysqli_prepare($con, $sql); // Bereid de SQL-query veilig voor
+     mysqli_stmt_bind_param($stmt, "ss", $username_or_email, $username_or_email); // Koppeld de ingevoerde waarden (twee strings)aan de query
+     mysqli_stmt_execute($stmt); // Voert de zoekactie uit
+     $result = mysqli_stmt_get_result($stmt); // Haalt het resultaat van de zoekopdracht op
+
+    // Controleert of de query een rij met gebruikersgegevens heeft teruggegeven
+     if ($row = mysqli_fetch_assoc($result)) { // Als er een gebruiker is gevonden, wordt de data in $row geplaatst
+
+        // BEVEILIGING: Vergelijkt het ingevoerde wachtwoord met de veilige 'hash' uit de database
+     if (password_verify($password, $row['wachtwoord'])) { // Controleert of de hash en het ingevoerde wachtwoord matchen
+            // Als het wachtwoord klopt, worden de sessievariabelen gevuld
+         $_SESSION["logged_in"] = true; // Markering dat de gebruiker succesvol is ingelogd
+             $_SESSION["user_id"] = $row['id']; // Slaat de unieke ID van de gebruiker op
+             $_SESSION["username"] = $row['gebruikersnaam']; // Slaat de gebruikersnaam op
+             $_SESSION["niveau"] = $row['niveau']; // Slaat het niveau (HAVO/VWO) op
+             $_SESSION["leerjaar"] = $row['leerjaar']; // Slaat het leerjaar op
+             $_SESSION["school"] = $row['school']; // Slaat de schoolnaam op
+             $_SESSION["vak_id"] = $row['vak_id']; // Slaat het ID van het favoriete vak op (voor index.php)
+
+            // Stuurt de gebruiker door naar de hoofdpagina
+         header("Location: index.php"); 
+         exit(); // Stopt de verdere code-uitvoering
+         } else {
+         $error = "Wachtwoord onjuist!"; // Stelt de foutmelding in als het wachtwoord verkeerd is
+         }
+ } else {
+     $error = "Gebruiker of E-mail bestaat niet!"; // Stelt de foutmelding in als er geen gebruiker is gevonden
+     }
+
+     mysqli_stmt_close($stmt); // Sluit het statement om databasebronnen vrij te geven
+}
+
+mysqli_close($con); // Sluit de databaseverbinding
+?>
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="php.css">
-    <title>BrainBoost | Quiz</title>
+    </head>
+<body>
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="php.css"> 
+    <title>BrainBoost | Inloggen</title>
     <link rel="shortcut icon" href="quizlogo.png" type="image/x-icon">
     <style>
         body {
@@ -45,17 +113,15 @@
         }
         .container { padding: 10px 0; }
         span.psw { float: right; margin-top: 10px; }
-        @media screen and (max-width: 300px) {
-            form { width: 90%; }
-            span.psw { float: none; display: block; text-align: center; }
-        }
+        .bottom-container { padding-top: 15px; }
+        .bottom-container a button { background-color: #ed7eb4; } /* Kleur aanmeldknop */
     </style>
 </head>
 <body>
 <form action="" method="post">
     <div class="container">
         <label for="uname"><b>Inloggen</b></label>
-        <input type="text" placeholder="Uw gebruikersnaam" name="uname" required>
+        <input type="text" placeholder="Gebruikersnaam of E-mail" name="uname" required>
         <label for="psw"></label>
         <input type="password" placeholder="Uw wachtwoord" name="psw" required>
         <button type="submit">Login</button>
@@ -63,102 +129,16 @@
             <input type="checkbox" checked="checked" name="remember"> Onthoud mij
         </label>
         <div class="bottom-container">
-  <div class="row">
-    <div class="col">
-	<button onclick="document.getElementById('id01').style.display='block'" style="width:auto">Aanmelden</button>
-<!--De <button>-tag definieert een klikbare knop.-->
-<!--Het onclick-attribuut wordt geactiveerd door een muisklik op het element.-->
-    </div>
-  </div>
-</div>
-    </form>
-<div id="id01" class="modal">
-<!--Het ID-attribuut: wordt gebruikt om de koppeling met een ID te realiseren.-->
-  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
- <!--Het title-element specificeert extra informatie over een element.-->
-   <form class="modal-content" action="register.php" method="POST">
-  <div class="container">
-    <h1>Aanmelden</h1>
-    <p>Vul uw gegevens in om een account aan te maken.</p>
-    <hr>
-
-    <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Uw e-mailadres" name="email" required>
-
-    <label for="psw"><b>Wachtwoord</b></label>
-    <input type="password" placeholder="Uw wachtwoord" name="psw" required>
-
-    <label for="psw-repeat"><b>Herhaal wachtwoord</b></label>
-    <input type="password" placeholder="Herhaal uw wachtwoord" name="psw_repeat" required>
-
-    <label>
-      <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Onthouden
-    </label>
-
-    <p>Door dit account aan te maken gaat u akkoord met onze <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>
-
-    <div class="clearfix">
-      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-      <button type="submit" class="signupbtn">Aanmelden</button>
-    </div>
-  </div>
+            <div class="row">
+                <div class="col">
+                    <a href="aanmeldscherm.php"><button type="button" style="width:100%;">Aanmelden</button></a>
+                </div>
+            </div>
+        </div>
+        <?php if (!empty($error)): ?>
+            <p style="color: red; text-align: center; margin-top: 10px;"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
     </div>
 </form>
-
-<?php
-session_start(); // Start de sessie
-
-// Verbinding maken met database
-$con = mysqli_connect("localhost", "root", "", "po_webapp");
-if (!$con) {
-    die("Databasefout: " . mysqli_connect_error());
-}
-
-// Als het formulier is verzonden
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    $username = $_POST["uname"] ?? "";
-    $password = $_POST["psw"] ?? "";
-
-    // Bereid SQL query voor
-    $sql = "SELECT id, gebruikersnaam, wachtwoord, niveau, leerjaar, school 
-            FROM gebruiker 
-            WHERE gebruikersnaam = ?";
-    $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $username);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_store_result($stmt);
-
-    // Check of gebruiker bestaat
-    if (mysqli_stmt_num_rows($stmt) === 1) {
-
-        mysqli_stmt_bind_result($stmt, $id, $db_user, $db_pass, $niveau, $leerjaar, $school);
-        mysqli_stmt_fetch($stmt);
-
-        // Controle wachtwoord (nu plain-text)
-        if ($password === $db_pass) {
-            // Vul sessievariabelen
-            $_SESSION["logged_in"] = true;
-            $_SESSION["user_id"] = $id;
-            $_SESSION["username"] = $db_user;
-            $_SESSION["niveau"] = $niveau;
-            $_SESSION["leerjaar"] = $leerjaar;
-            $_SESSION["school"] = $school;
-
-            // Redirect naar index
-            header("Location: index.php");
-            exit();
-        } else {
-            $error = "Wachtwoord onjuist!";
-        }
-    } else {
-        $error = "Gebruiker bestaat niet!";
-    }
-
-    mysqli_stmt_close($stmt);
-}
-
-mysqli_close($con);
-?>
 </body>
 </html>

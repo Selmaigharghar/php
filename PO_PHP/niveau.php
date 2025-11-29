@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) die("Je moet eerst inloggen!");
 $con = mysqli_connect("localhost","root","","po_webapp");
 if (!$con) die("Databasefout: " . mysqli_connect_error());
 
-// Haal niveau uit URL
+// Haal niveau uit URL (verwacht: HAVO of VWO, consistent met ENUM)
 $niveau = $_GET['niveau'] ?? null;
 $username = $_SESSION['username'];
 
