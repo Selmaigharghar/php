@@ -1,23 +1,23 @@
 <?php
 session_start();
 
-// Check of de gebruiker is ingelogd
+// Check of ingelogd
 if (!isset($_SESSION['username'])) die("Je moet eerst inloggen!");
 
 $con = mysqli_connect("localhost","root","","po_webapp");
 if (!$con) die("Databasefout: " . mysqli_connect_error());
 
-// Haal niveau uit URL, is HAVO of VWO 
-$niveau = $_GET['niveau'] ?? null;
+
+$leerjaar = $_GET['leerjaar'] ?? null;
 $username = $_SESSION['username'];
 
-// SQL: Update niveau in de tabel 'gebruiker'
-$stmt = mysqli_prepare($con, "UPDATE gebruiker SET niveau=? WHERE gebruikersnaam=?");
-mysqli_stmt_bind_param($stmt, "ss", $niveau, $username);
+
+$stmt = mysqli_prepare($con, "UPDATE gebruiker SET leerjaar=? WHERE gebruikersnaam=?");
+mysqli_stmt_bind_param($stmt, "ss", $leerjaar, $username);
 mysqli_stmt_execute($stmt);
 
 // Update sessie direct
-$_SESSION['niveau'] = $niveau;
+$_SESSION['leerjaar'] = $leerjaar;
 
 header("Location: index.php");
 exit();

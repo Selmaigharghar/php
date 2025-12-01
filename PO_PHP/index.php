@@ -33,16 +33,21 @@ if (isset($_SESSION['vak_id'])) {
 $quizes = [];
 $niveau = $_SESSION['niveau'] ?? null;
 $leerjaar = $_SESSION['leerjaar'] ?? null;
+$vak_id_filter = $_SESSION['vak_id'] ?? null; // HAALT HET GEKOZEN VAK ID OP UIT DE SESSIE
 
-if ($niveau && $leerjaar) {
+// Controleert of we alle drie de benodigde filters hebben
+if ($niveau && $leerjaar && $vak_id_filter) { 
+
+    // De SQL-query filtert nu op niveau, leerjaar EN vak ID.
     $sql = "SELECT q.titel, v.naam AS vak_naam, o.naam AS onderwerp_naam, q.id 
             FROM quiz q
             JOIN onderwerp o ON q.onderwerp_id = o.id
             JOIN vak v ON o.vak_id = v.id
-            WHERE q.niveau = ? AND q.leerjaar = ?";
+            WHERE q.niveau = ? AND q.leerjaar = ? AND v.id = ?"; // HIER WORDT DE VAKFILTER TOEGEVOEGD
     
     $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, "ss", $niveau, $leerjaar);
+    // Koppel de drie parameters: twee strings (ss) en één integer (i)
+    mysqli_stmt_bind_param($stmt, "ssi", $niveau, $leerjaar, $vak_id_filter);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     
@@ -107,6 +112,15 @@ mysqli_close($con);
                 <li><a href="vak.php?vak_id=4">Biologie</a></li>
             </ul>
         </li>
+        <li><a href="#">leerjaar: <?= $_SESSION['leerjaar'] ?? "kies" ?></a>
+            <ul>
+                <li><a href="leerjaar.php?leerjaar=2">2</a></li>
+                <li><a href="leerjaar.php?leerjaar=3">3</a></li>
+                <li><a href="leerjaar.php?leerjaar=4">4</a></li>
+                <li><a href="leerjaar.php?leerjaar=5">5</a></li>
+                <li><a href="leerjaar.php?leerjaar=6">6</a></li>
+            </ul>
+        </li>
         <li><a href="logout.php">Uitloggen</a></li>
     </ul>
 </nav>
@@ -114,10 +128,10 @@ mysqli_close($con);
 <div class="content">
     
     <div class="user-info">
-        <h2>Welkom, <?= htmlspecialchars($_SESSION['username'] ?? 'Gast') ?>! 👋</h2>
-        <p>Jouw Profiel:</p>
+        <h2>Welkom,<?= htmlspecialchars($_SESSION['username'] ?? 'Gast') ?>! </h2>
+        <p>Jouw profiel:</p>
         <ul>
-            <li>Niveau: <?= htmlspecialchars($niveau) ?></li>
+            <li>Niveau:<?= htmlspecialchars($niveau) ?></li>
             <li>Leerjaar: <?= htmlspecialchars($leerjaar) ?></li>
             <li>School: <?= htmlspecialchars($school) ?></li>
             <li>Voorkeursvak:<?= htmlspecialchars($vak_naam) ?></li>
@@ -130,7 +144,7 @@ mysqli_close($con);
         <?php if (!empty($quizes)): ?>
             <?php foreach ($quizes as $quiz): ?>
                 <div class="quiz-item">
-                    **<?= htmlspecialchars($quiz['titel']) ?>** (Vak: <?= htmlspecialchars($quiz['vak_naam']) ?>, Onderwerp: <?= htmlspecialchars($quiz['onderwerp_naam']) ?>)
+                    <?= htmlspecialchars($quiz['titel']) ?> (Vak: <?= htmlspecialchars($quiz['vak_naam']) ?>, Onderwerp: <?= htmlspecialchars($quiz['onderwerp_naam']) ?>)
                 </div>
             <?php endforeach; ?>
         <?php else: ?>

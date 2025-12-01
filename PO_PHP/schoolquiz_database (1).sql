@@ -83,29 +83,56 @@ INSERT INTO vak (id, naam) VALUES
 -- ONDERWERPEN (NODIG VOOR QUIZ)
 INSERT INTO onderwerp (id, naam, vak_id) VALUES
 (1, 'Algebra', 1),
-(2, 'Meetkunde', 1),
-(3, 'Kracht en Beweging', 2),
-(4, 'Elektriciteit', 2),
-(5, 'Moleculen', 3),
-(6, 'Reacties', 3),
-(7, 'Cellen', 4),
-(8, 'Evolutie', 4);
+(2, 'Kracht en Beweging', 2),
+(3, 'Moleculen', 3),
+(4, 'Evolutie', 4);
 
 -- GEBRUIKERS (NODIG VOOR TESTEN VAN INLOGGEN)
--- Let op: Wachtwoorden zijn gehasht (password_hash('test123', PASSWORD_DEFAULT))
+-- Wachtwoorden zijn gehasht (password_hash('test123', PASSWORD_DEFAULT))
 -- Dit is essentieel voor je Inlogscherm.php en aanmeldscherm.php
 INSERT INTO gebruiker (gebruikersnaam, voornaam, achternaam, email, wachtwoord, niveau, leerjaar, school, vak_id) VALUES
-('jan', 'Jan', 'Smit', 'jan@example.com', '$2y$10$tMh4fA.hD2S3R9I5uX.dJ.cWzR7/wQ.yA.k1n.L3T4B5O6P7Q', 'HAVO', '5', 'St. Michaelcollege', 1), -- Wachtwoord: test123
-('lisa', 'Lisa', 'Bakker', 'lisa@example.com', '$2y$10$tMh4fA.hD2S3R9I5uX.dJ.cWzR7/wQ.yA.k1n.L3T4B5O6P7Q', 'VWO', '6', 'Bertrand Russel', 2), -- Wachtwoord: test123
-('emma', 'Emma', 'Vries', 'emma@example.com', '$2y$10$tMh4fA.hD2S3R9I5uX.dJ.cWzR7/wQ.yA.k1n.L3T4B5O6P7Q', 'HAVO', '4', 'Zaanlands', 3); -- Wachtwoord: test123
+('jan', 'Jan', 'Smit', 'jan@example.com', '$2y$10$tMh4fA.hD2S3R9I5uX.dJ.cWzR7/wQ.yA.k1n.L3T4B5O6P7Q', 'HAVO', '5', 'St.Michael College', 1),
 
--- QUIZZEN (NODIG VOOR DE INDEXPAGINA)
+
+
 INSERT INTO quiz (titel, onderwerp_id, niveau, leerjaar) VALUES
-('Algebra – Basisvoorwaarden', 1, 'HAVO', '4'),
-('Meetkunde – Driehoeken',     2, 'HAVO', '5'),
-('Krachten – Introductie',     3, 'VWO',  '4'),
-('Elektriciteit – Spanning',   4, 'HAVO', '5'),
-('Moleculen – Bouwstenen',     5, 'HAVO', '3'),
-('Reacties – Ontledingen',     6, 'VWO',  '6'),
-('Cellen – Basiskennis',       7, 'HAVO', '2'),
-('Evolutie – Darwin',          8, 'VWO',  '5');
+('Algebra Basisvoorwaarden', 1, 'HAVO', '2'),
+('Algebra Basisvoorwaarden', 1, 'HAVO', '3'),
+('Algebra Basisvoorwaarden', 1, 'HAVO', '4'),
+('Algebra Basisvoorwaarden', 1, 'HAVO', '5'),
+('Algebra Basisvoorwaarden', 1, 'HAVO', '6'),
+('Algebra Basisvoorwaarden', 1, 'VWO', '2'),
+('Algebra Basisvoorwaarden', 1, 'VWO', '3'),
+('Algebra Basisvoorwaarden', 1, 'VWO', '4'),
+('Algebra Basisvoorwaarden', 1, 'VWO', '5'),
+('Algebra Basisvoorwaarden', 1, 'VWO', '6'),
+('Krachten Introductie', 2, 'HAVO', '2'),
+('Krachten Introductie', 2, 'HAVO', '3'),
+('Krachten Introductie', 2, 'HAVO', '4'),
+('Krachten Introductie', 2, 'HAVO', '5'),
+('Krachten Introductie', 2, 'HAVO', '6'),
+('Krachten Introductie', 2, 'VWO', '2'),
+('Krachten Introductie', 2, 'VWO', '3'),
+('Krachten  Introductie', 2, 'VWO', '4'),
+('Krachten  Introductie', 2, 'VWO', '5'),
+('Krachten  Introductie', 2, 'VWO', '6'),
+('Moleculen  Bouwstenen', 3, 'HAVO', '2'),
+('Moleculen Bouwstenen', 3, 'HAVO', '3'),
+('Moleculen Bouwstenen', 3, 'HAVO', '4'),
+('Moleculen Bouwstenen', 3, 'HAVO', '5'),
+('Moleculen Bouwstenen', 3, 'HAVO', '6'),
+('Moleculen Bouwstenen', 3, 'VWO', '2'),
+('Moleculen Bouwstenen', 3, 'VWO', '3'),
+('Moleculen Bouwstenen', 3, 'VWO', '4'),
+('Moleculen Bouwstenen', 3, 'VWO', '5'),
+('Moleculen Bouwstenen', 3, 'VWO', '6'),
+('Evolutie Darwin', 4, 'HAVO', '2'),
+('Evolutie Darwin', 4, 'HAVO', '3'),
+('Evolutie Darwin', 4, 'HAVO', '4'),
+('Evolutie Darwin', 4, 'HAVO', '5'),
+('Evolutie Darwin', 4, 'HAVO', '6'),
+('Evolutie Darwin', 4, 'VWO', '2'),
+('Evolutie Darwin', 4, 'VWO', '3'),
+('Evolutie Darwin', 4, 'VWO', '4'),
+('Evolutie Darwin', 4, 'VWO', '5'),
+('Evolutie Darwin', 4, 'VWO', '6');

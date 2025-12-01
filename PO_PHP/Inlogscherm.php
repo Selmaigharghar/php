@@ -1,71 +1,63 @@
 <?php
-session_start(); // Dit start de PHP-sessie
+session_start(); // Start de sessie
 
-// CONTROLE: Controleert of de gebruiker al is ingelogd.
+// Controleer of de gebruiker al is ingelogd
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header("Location: index.php"); // Stuurt je wanneer je bent ingelogd direct door naar de hoofdpagina
-    exit(); // Stopt de verdere verwerking van dit script
+    header("Location: index.php"); // Stuur direct door naar home
+    exit();
 }
 
-// Zorgt voor een verbinding met de database
+// Verbinding maken met database
 $con = mysqli_connect("localhost", "root", "", "po_webapp");
 if (!$con) {
-     die("Databasefout: " . mysqli_connect_error()); // Als de verbinding mislukt, stopt de code en zie je een foutmelding
+    die("Databasefout: " . mysqli_connect_error());
 }
 
-$error = ""; // Initialiseert een lege variabele om eventuele inlgfouten in op te slaan
+$error = "";
 
-// Controleert of het de inlogformuliergegevens zijn verzonden via de POST-methode
+// Als het formulier is verzonden
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-     $username_or_email = $_POST["uname"] ?? ""; // leest de ingevulde gebruikersnaam of e-mail uit het formulier
-     $password = $_POST["psw"] ?? ""; // Leest het ingevulde wachtwoord uit het formulier
+    $username_or_email = $_POST["uname"] ?? "";
+    $password = $_POST["psw"] ?? "";
 
-    // VEILIGE QUERY: Selecteert alle benodigde kolommen om in te loggen en de sessie te vullen.
-     $sql = "SELECT id, gebruikersnaam, wachtwoord, niveau, leerjaar, school, vak_id
-     FROM gebruiker 
-     WHERE gebruikersnaam = ? OR email = ?"; // Zoekt de gebruiker op basis van ofwel de gebruikersnaam of het e-mailadres
-     $stmt = mysqli_prepare($con, $sql); // Bereid de SQL-query veilig voor
-     mysqli_stmt_bind_param($stmt, "ss", $username_or_email, $username_or_email); // Koppeld de ingevoerde waarden (twee strings)aan de query
-     mysqli_stmt_execute($stmt); // Voert de zoekactie uit
-     $result = mysqli_stmt_get_result($stmt); // Haalt het resultaat van de zoekopdracht op
+    // Zoek gebruiker op gebruikersnaam OF e-mail
+    $sql = "SELECT id, gebruikersnaam, wachtwoord, niveau, leerjaar, school, vak_id
+            FROM gebruiker 
+            WHERE gebruikersnaam = ? OR email = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "ss", $username_or_email, $username_or_email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt); // Haal resultaat op
 
-    // Controleert of de query een rij met gebruikersgegevens heeft teruggegeven
-     if ($row = mysqli_fetch_assoc($result)) { // Als er een gebruiker is gevonden, wordt de data in $row geplaatst
+    // Check of gebruiker bestaat
+    if ($row = mysqli_fetch_assoc($result)) {
 
-        // BEVEILIGING: Vergelijkt het ingevoerde wachtwoord met de veilige 'hash' uit de database
-     if (password_verify($password, $row['wachtwoord'])) { // Controleert of de hash en het ingevoerde wachtwoord matchen
-            // Als het wachtwoord klopt, worden de sessievariabelen gevuld
-         $_SESSION["logged_in"] = true; // Markering dat de gebruiker succesvol is ingelogd
-             $_SESSION["user_id"] = $row['id']; // Slaat de unieke ID van de gebruiker op
-             $_SESSION["username"] = $row['gebruikersnaam']; // Slaat de gebruikersnaam op
-             $_SESSION["niveau"] = $row['niveau']; // Slaat het niveau (HAVO/VWO) op
-             $_SESSION["leerjaar"] = $row['leerjaar']; // Slaat het leerjaar op
-             $_SESSION["school"] = $row['school']; // Slaat de schoolnaam op
-             $_SESSION["vak_id"] = $row['vak_id']; // Slaat het ID van het favoriete vak op (voor index.php)
+        if (password_verify($password, $row['wachtwoord'])) {
+            // Vul sessievariabelen
+            $_SESSION["logged_in"] = true;
+            $_SESSION["user_id"] = $row['id'];
+            $_SESSION["username"] = $row['gebruikersnaam'];
+            $_SESSION["niveau"] = $row['niveau'];
+            $_SESSION["leerjaar"] = $row['leerjaar'];
+            $_SESSION["school"] = $row['school'];
+            $_SESSION["vak_id"] = $row['vak_id']; // Slaat vak_id op
 
-            // Stuurt de gebruiker door naar de hoofdpagina
-         header("Location: index.php"); 
-         exit(); // Stopt de verdere code-uitvoering
-         } else {
-         $error = "Wachtwoord onjuist!"; // Stelt de foutmelding in als het wachtwoord verkeerd is
-         }
- } else {
-     $error = "Gebruiker of E-mail bestaat niet!"; // Stelt de foutmelding in als er geen gebruiker is gevonden
-     }
+            // Redirect naar index
+            header("Location: index.php");
+            exit();
+        } else {
+            $error = "Wachtwoord onjuist!";
+        }
+    } else {
+        $error = "Gebruiker of E-mail bestaat niet!";
+    }
 
-     mysqli_stmt_close($stmt); // Sluit het statement om databasebronnen vrij te geven
+    mysqli_stmt_close($stmt);
 }
 
-mysqli_close($con); // Sluit de databaseverbinding
+mysqli_close($con);
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    </head>
-<body>
-    </body>
-</html>
 <!DOCTYPE html>
 <html>
 <head>
@@ -125,9 +117,6 @@ mysqli_close($con); // Sluit de databaseverbinding
         <label for="psw"></label>
         <input type="password" placeholder="Uw wachtwoord" name="psw" required>
         <button type="submit">Login</button>
-        <label>
-            <input type="checkbox" checked="checked" name="remember"> Onthoud mij
-        </label>
         <div class="bottom-container">
             <div class="row">
                 <div class="col">
